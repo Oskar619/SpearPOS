@@ -62,6 +62,9 @@ module.exports = (env) => {
                 manifest: require('./ClientApp/dist/vendor-manifest.json'),
                 sourceType: 'commonjs2',
                 name: './vendor'
+            }),
+            new webpack.DefinePlugin({
+                window: undefined,
             })
         ],
         output: {

@@ -1,6 +1,6 @@
 import { AppThunkAction } from "ClientApp/store";
 import { addTask, fetch } from "domain-task";
-import { GenericApiResponse } from "ClientApp/store/ApiResponse";
+import { GenericApiResponse, GenericApiResponseWithResult } from "ClientApp/store/ApiResponse";
 import { Reducer } from "redux";
 
 export interface RetailState {
@@ -191,10 +191,10 @@ export const actionCreators = {
     },
     requestRetailData: (ticketType:string) : AppThunkAction<KnownAction> => (dispatch, getState) => {
         // Only load data if it's something we don't already have (and are not already loading)
-            let fetchTask = fetch(`api/Retail/RetailData`)
-                .then(response => response.json() as Promise<RetailCategoryListItem[]>)
+            let fetchTask = fetch(`api/Retail/GetRetailData`)
+                .then(response => response.json() as Promise<GenericApiResponseWithResult<RetailCategoryListItem[]>>)
                 .then(data => {
-                    dispatch({ type: 'RECEIVE_RETAIL_DATA', items: data });
+                    dispatch({ type: 'RECEIVE_RETAIL_DATA', items: data.result });
                 });
 
             addTask(fetchTask); // Ensure server-side prerendering waits for this to complete
@@ -202,7 +202,7 @@ export const actionCreators = {
     },
     requestTicketItems: (ticketId: number) : AppThunkAction<KnownAction> => (dispatch, getState) => {
         // Only load data if it's something we don't already have (and are not already loading)
-            let fetchTask = fetch(`api/Retail/TicketItems/${ticketId}`)
+            let fetchTask = fetch(`api/Retail/GetTicketItems/${ticketId}`)
                 .then(response => response.json() as Promise<RetailTicketItem[]>)
                 .then(data => {
                     dispatch({ type: 'RECEIVE_RETAIL_TICKET_ITEMS', ticketItems:data });

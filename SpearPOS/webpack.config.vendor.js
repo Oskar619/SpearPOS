@@ -18,6 +18,8 @@ module.exports = (env) => {
         entry: {
             vendor: [
                 'semantic-ui-react',
+                'semantic-ui-css',
+                'semantic-ui-css/semantic.min.css',
                 'domain-task',
                 'event-source-polyfill',
                 'history',

@@ -23,9 +23,13 @@ namespace SpearPOS.Controllers
         }
 
         [HttpGet("[action]")]
-        public IEnumerable<RetailCategoryListItem> GetRetailData(string ticketType)
+        public GenericApiResponseWithResult<IEnumerable<RetailCategoryListItem>> GetRetailData(string ticketType)
         {
+            var result = new GenericApiResponseWithResult<IEnumerable<RetailCategoryListItem>>();
             var categoriesResult = new List<RetailCategoryListItem>();
+
+            try
+            { 
             foreach (var category in _context.ItemCategories)
             {
                 var categoryResult = new RetailCategoryListItem();
@@ -100,8 +104,16 @@ namespace SpearPOS.Controllers
                 categoryResult.Groups = groupsResult.ToArray();
                 categoriesResult.Add(categoryResult);
             }
+            }catch(Exception ex)
+            {
+                result.Success = false;
+                result.Error = (int) ErrorCodes.InternalServerError;
+                result.Message = ex.Message;
+            }
 
-            return categoriesResult.ToArray();
+            result.Success = true;
+            result.Result = categoriesResult.ToArray();
+            return result;
         }
 
         [HttpPost("[action]")]
@@ -232,7 +244,7 @@ namespace SpearPOS.Controllers
         public void SyncTicketItem(TicketItem item, RetailTicketItem ticketItem)
         {
             item.Id = ticketItem.Id;
-            item.HasModifiers = ticketItem.Modifiers != null || ticketItem.Modifiers.Length == 0;
+            item.HasModifiers = ticketItem.Modifiers != null && ticketItem.Modifiers.Length == 0;
             item.Beverage = ticketItem.Beverage;
             item.GroupName = ticketItem.GroupName;
             item.CategoryName = ticketItem.CategoryName;

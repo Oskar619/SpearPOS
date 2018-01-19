@@ -11,4 +11,9 @@ namespace SpearPOS.Models.ResponseModels
         public int Error { get; set; }
         public string Message { get; set; }
     }
+
+    public class GenericApiResponseWithResult<TResult> : GenericApiResponse
+    {
+        public TResult Result { get; set; }
+    }
 }

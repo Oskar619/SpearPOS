@@ -28,21 +28,25 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="ClientApp\components\Category.tsx" />
     <None Remove="ClientApp\components\OpenTickets.tsx" />
+    <None Remove="ClientApp\store\Category.ts" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="node_modules\semantic-ui-react\src\semantic.js" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\components\Category.tsx" />
     <TypeScriptCompile Include="ClientApp\components\OpenTickets.tsx" />
+    <TypeScriptCompile Include="ClientApp\store\Category.ts" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="node_modules\semantic-ui-react\src\" />
   </ItemGroup>
 
   <Target Name="DebugRunWebpack" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('wwwroot\dist') ">

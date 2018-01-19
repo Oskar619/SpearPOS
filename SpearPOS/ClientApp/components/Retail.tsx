@@ -39,26 +39,38 @@ class Retail extends React.Component<RetailProps, {}> {
     }
 
     private renderRetailScreen() {
-        return <Grid celled>
+        return <Grid celled padded>
             <Grid.Row stretched>
-         <Grid.Column width={12}>
-        <Grid celled>
-            <Grid.Row height={2}>
+         <Grid.Column width={14}>
+        <Grid celled padded>
+              <Grid.Row width={2}>
                 <Grid.Column width={4}>
                     <Segment>Top Left Menu</Segment>
                 </Grid.Column>
-                <Grid.Column width={8}>
-                    <Segment>Top Center Menu</Segment>
+                <Grid.Column width={12}>
+                                <Segment>Top Center Menu</Segment>
                 </Grid.Column>
-                        </Grid.Row>
-            <Grid.Row height={12}>
+            </Grid.Row>
+            <Grid.Row width={12} stretched>
                 <Grid.Column width={4}>
-                    <Segment>Top Left Menu</Segment>
+                                <Segment>Middle Left Segment</Segment>
+                                <Segment>Middle Left Segment</Segment>
+                                <Segment>Middle Left Segment</Segment>
+                                <Segment>Middle Left Segment</Segment>
+                                <Segment>Middle Left Segment</Segment>
                 </Grid.Column>
-                <Grid.Column width={8}>
-                    <Segment>Top Center Menu</Segment>
+                <Grid.Column width={12}>
+                    <Segment>Middle Center Segment</Segment>
                 </Grid.Column>
-                        </Grid.Row>
+             </Grid.Row>
+            <Grid.Row width={2}>
+                <Grid.Column width={4}>
+                    <Segment>Bottom Left Segment</Segment>
+                </Grid.Column>
+                <Grid.Column width={12}>
+                                <Segment>Bottom Center Segment</Segment>
+                </Grid.Column>
+            </Grid.Row>
         </Grid>
          </Grid.Column>
          <Grid.Column width={2}>

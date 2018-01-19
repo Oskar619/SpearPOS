@@ -10,6 +10,7 @@ namespace SpearPOS.Enums
     public enum ErrorCodes
     {
         RetailScreenNotFoundTicket = 1,
+        InternalServerError = 2
     }
 
     public static class ErrorMessages
