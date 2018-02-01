@@ -25,54 +25,8 @@ class OpenTickets extends React.Component<OpenticketsProps, {}> {
 
     public render() {
         return <div>
-            {this.renderBody()}
+            This is Open Tickets view.
         </div>;
-    }
-
-    private renderBody() {
-        return <Sidebar.Pushable as={Segment}>
-            <Sidebar as={Menu} animation='uncover' width='thin' visible={true} icon='labeled' vertical inverted>
-                <Menu.Item name='dinein' onClick={() => this.props.tableSelection()}>
-                    Dine In
-                </Menu.Item>
-                <NavLink to={'/Retail?ticketType=takeOut'}>
-                <Menu.Item name='takeout'>
-                    Take Out
-            </Menu.Item></NavLink>
-                <NavLink to={'/Retail?ticketType=retail'}>
-                <Menu.Item name='retail'>
-                    Quick Sale
-            </Menu.Item></NavLink>
-            </Sidebar>
-            <Sidebar.Pusher>
-                <Segment basic>
-                    {this.renderTicketsTable()}
-                </Segment>
-            </Sidebar.Pusher>
-        </Sidebar.Pushable>
-    }
-
-    private renderTicketsTable() {
-        return <table className='table'>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Temp. (C)</th>
-                    <th>Temp. (F)</th>
-                    <th>Summary</th>
-                </tr>
-            </thead>
-            <tbody>
-                {this.props.tickets.map(ticket =>
-                    <tr key={ticket.Id}>
-                        <td>{ticket.TableId}</td>
-                        <td>{ticket.PaidAmount}</td>
-                        <td>{ticket.Settled}</td>
-                        <td>{ticket.Paid}</td>
-                    </tr>
-                )}
-            </tbody>
-        </table>;
     }
 }
 

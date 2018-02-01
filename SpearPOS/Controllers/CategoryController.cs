@@ -24,7 +24,7 @@ namespace SpearPOS.Controllers
         }
 
         [HttpGet("[action]")]
-        public GenericApiResponseWithResult<IEnumerable<CategoryListItem>> GetCatergories()
+        public GenericApiResponseWithResult<IEnumerable<CategoryListItem>> GetCategories()
         {
             var result = new GenericApiResponseWithResult<IEnumerable<CategoryListItem>>();
             var categoryItems = new List<CategoryListItem>();
@@ -46,11 +46,56 @@ namespace SpearPOS.Controllers
         }
 
         [HttpPost("[action]")]
-        public GenericApiResponse SaveCategory([FromBody] RetailTicket ticketInfo, [FromBody] RetailTicketItem[] ticketItems)
+        public GenericApiResponseWithResult<CategoryListItem> SaveCategory([FromBody] CategoryListItem category)
         {
-            var response = new GenericApiResponse();
+            var result = new GenericApiResponseWithResult<CategoryListItem>();
+            var cat = new ItemCategory();
+            result.Success = true;
+            try
+            {
+                var itemExists = _context.ItemCategories.Count(x => x.Id == category.Id) > 0;
+                if (!itemExists)
+                {
+                    category.CreationUserId = "oobeso";
+                    category.CreationDate = DateTime.Now;
+                    category.IsDeleted = false;
+                    Sync(cat, category);
+                    _context.Add(cat);
+                }
+                else
+                {
+                    cat = _context.ItemCategories.FirstOrDefault(x => x.Id == category.Id);
+                    category.UpdateDate = DateTime.Now;
+                    category.UpdateUserId = "oobeso";
+                    Sync(cat, category);
+                }
+                _context.SaveChanges();
 
-            return response;
+            }catch(Exception ex)
+            {
+                result.Success = false;
+                result.Error = (int)ErrorCodes.InternalServerError;
+                result.Message = ex.Message;
+            }
+
+            if(result.Success)
+                result.Result = new CategoryListItem { Beverage = cat.Beverage, Id = cat.Id, ButtonColor = cat.ButtonColor, Name = cat.Name, TextColor = cat.TextColor  };
+
+            return result;
+        }
+
+        private void Sync(ItemCategory category, CategoryListItem item)
+        {
+            category.TextColor = item.TextColor != null ? item.TextColor.Value : 0;
+            category.Name = item.Name;
+            category.Beverage = item.Beverage;
+            category.ButtonColor = item.ButtonColor != null ? item.ButtonColor.Value : 0;
+            category.CreationDate = item.CreationDate;
+            category.CreationUserId = item.CreationUserId;
+            category.IsDeleted = item.IsDeleted;
+            category.SortOrder = item.SortOrder;
+            category.UpdateDate = item.UpdateDate;
+            category.UpdateUserId = item.UpdateUserId;
         }
     }
 }
