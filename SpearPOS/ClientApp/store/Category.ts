@@ -4,35 +4,35 @@ import { Reducer } from "redux";
 import { GenericApiResponseWithResult } from "ClientApp/store/ApiResponse";
 
 export interface CategoryState {
-    selectedCategory?: CategoryListItem;
-    categories: CategoryListItem[];
+    selectedCategory?: ItemCategory;
+    categories: ItemCategory[];
     saving: boolean;
     fetching: boolean;
-    saveResult?: GenericApiResponseWithResult<CategoryListItem>;
+    saveResult?: GenericApiResponseWithResult<ItemCategory>;
 }
 
-export interface CategoryListItem{
-    id?: number;
-    name?: string;
-    beverage?: boolean;
-    buttonColor?: number;
-    textColor?: number;
-    isDeleted?: boolean;
-    updateDate?: string;
-    creationDate?: string;
-    creationUserId?: string;
-    sortOrder?: number;
-    updateUserId?: string;
+export interface ItemCategory{
+    Id?: number;
+    Name?: string;
+    Beverage?: boolean;
+    ButtonColor?: number;
+    TextColor?: number;
+    IsDeleted?: boolean;
+    UpdateDate?: Date;
+    CreationDate?: Date;
+    CreationUserId?: string;
+    SortOrder?: number;
+    UpdateUserId?: string;
+    TranslatedName?: string;
 }
 
 enum Action {
     RequestCategories = 'REQUEST_CATEGORIES',
     ReceiveCategories = 'RECEIVE_CATEGORIES',
     CreateCategory = 'CREATE_CATEGORY',
-    EditCategory = 'EDIT_CATEGORY',
-    DeleteCategory = 'DELETE_CATEGORY',
     SaveCategory = 'SAVE_CATEGORY',
     SaveCategoryResponse = 'SAVE_CATEGORY_RESPONSE',
+    SetActiveCategory = 'SET_ACTIVE_CATEGORY',
 }
 
 interface RequestCategoriesAction {
@@ -41,7 +41,7 @@ interface RequestCategoriesAction {
 
 interface ReceiveCategoriesAction {
     type: Action.ReceiveCategories,
-    categories: CategoryListItem[]
+    categories: ItemCategory[]
 }
 
 interface CreateCategoryAction {
@@ -50,23 +50,45 @@ interface CreateCategoryAction {
 
 interface SaveCategoryAction {
     type: Action.SaveCategory,
-    category?: CategoryListItem
+    category?: ItemCategory
 }
 
 interface SaveCategoryResponse {
     type: Action.SaveCategoryResponse,
-    response: GenericApiResponseWithResult<CategoryListItem>
+    response: GenericApiResponseWithResult<ItemCategory>
+}
+
+export class API {
+    static Get: string = '/api/Category/GetCategories';
+    static Save: string = 'api/Category/SaveCategory';
+    static GeneratePostRequest: any = (body : string) => {
+        return {
+            method: 'POST',
+                headers: {
+                Accept: 'application/json',
+                    'Content-Type': 'application/json',
+            },
+            body: body,
+        }
+    }
+
+
+}
+
+interface SetActiveCategoryAction {
+    type: Action.SetActiveCategory,
+    id: number
 }
 
 type KnownAction = SaveCategoryAction | CreateCategoryAction
-    | ReceiveCategoriesAction | RequestCategoriesAction | SaveCategoryResponse;
+    | ReceiveCategoriesAction | RequestCategoriesAction | SaveCategoryResponse | SetActiveCategoryAction;
 
 export const actionCreators = {
     requestCategories: (): AppThunkAction<KnownAction> => (dispatch, getState) => {
-        let fetchTask = fetch('/api/Category/GetCategories')
-            .then(response => response.json() as Promise<GenericApiResponseWithResult<CategoryListItem[]>>)
+        let fetchTask = fetch(API.Get)
+            .then(response => response.json() as Promise<GenericApiResponseWithResult<ItemCategory[]>>)
             .then(data => {
-                dispatch({ type: Action.ReceiveCategories, categories: data.result });
+                dispatch({ type: Action.ReceiveCategories, categories: data.Result });
             });
         addTask(fetchTask);
         dispatch({ type: Action.RequestCategories });
@@ -74,22 +96,19 @@ export const actionCreators = {
     createCategory: (): AppThunkAction<KnownAction> => (dispatch, getState) => {
         dispatch({ type: Action.CreateCategory });
     },
-    saveCategory: (category: CategoryListItem): AppThunkAction<KnownAction> => (dispatch, getState) => {
-        let fetchTask = fetch('api/Category/SaveCategory', {
-            method: 'POST',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(category),
-        })
-            .then(response => response.json() as Promise<GenericApiResponseWithResult<CategoryListItem>>)
+    saveCategory: (category: ItemCategory): AppThunkAction<KnownAction> => (dispatch, getState) => {
+        let fetchTask = fetch(API.Save, API.GeneratePostRequest(JSON.stringify(category)))
+            .then(response => response.json() as Promise<GenericApiResponseWithResult<ItemCategory>>)
             .then(data => {
                 dispatch({ type: Action.SaveCategoryResponse, response: data })
+                dispatch({type: Action.RequestCategories})
             });
         addTask(fetchTask);
         if (category === undefined) { return;}
         dispatch({ type: Action.SaveCategory, category: category });
+    },
+    setActiveCategory: (id: number): AppThunkAction<KnownAction> => (dispatch, getState) => {
+        dispatch({ type: Action.SetActiveCategory, id: id });
     }
 }
 
@@ -112,8 +131,11 @@ export const reducer: Reducer<CategoryState> = (state: CategoryState, action: Kn
         case Action.SaveCategory:
             return { ...state, selectedCategory: action.category, saving:true };
         case Action.SaveCategoryResponse:
-            var newCategories = state.categories.concat(action.response.result)
-            return { ...state, categories: newCategories, saving:false, saveResult: action.response }
+            var newCategories = state.categories.filter(x => x.Id != action.response.Result.Id).concat(action.response.Result);
+            return { ...state, categories: newCategories, saving: false, saveResult: action.response };
+        case Action.SetActiveCategory:
+            var activeCat = state.categories.find(x => x.Id == action.id);
+            return { ...state, selectedCategory: activeCat };
         default:
             // The following line guarantees that every action in the KnownAction union has been covered by a case above
             const exhaustiveCheck: never = action;

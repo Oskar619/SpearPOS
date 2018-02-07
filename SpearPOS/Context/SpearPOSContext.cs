@@ -13,6 +13,7 @@ namespace SpearPOS.Models
         public SpearPOSContext(DbContextOptions<SpearPOSContext> options)
             : base(options)
         {
+            Database.EnsureCreated();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

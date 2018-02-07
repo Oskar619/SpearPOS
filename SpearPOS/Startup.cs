@@ -30,7 +30,11 @@ namespace SpearPOS
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            services.AddMvc().AddJsonOptions(options =>
+            {
+                options.SerializerSettings.ContractResolver
+                    = new Newtonsoft.Json.Serialization.DefaultContractResolver();
+            });
 
             services.AddDbContext<SpearPOSContext>(options => 
             options.UseSqlite(_appSettings.GetConnectionString("SpearPOSContext")));

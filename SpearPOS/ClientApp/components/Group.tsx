@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import { Grid, Segment, List, Button, Table, Icon, Modal, Header, Form, Checkbox, Message, Menu, Input } from 'semantic-ui-react';
 import { DateFormatter } from '../lib/Utils';
 
-type CategoryProps =
+type GroupProps =
     CategoryStore.CategoryState
     & typeof CategoryStore.actionCreators
     & RouteComponentProps<{}>;
@@ -27,7 +27,7 @@ const unloadedState: ComponentState = {
     filteredList: []
 }
 
-class Category extends React.Component<CategoryProps, ComponentState> {
+class Category extends React.Component<GroupProps, ComponentState> {
 
 
     //INPUT ELEMENT STRINGS
@@ -37,7 +37,7 @@ class Category extends React.Component<CategoryProps, ComponentState> {
 
     //----------------Class Methods-------------------------------------------------------------------------
 
-    constructor(props: CategoryProps) {
+    constructor(props: GroupProps) {
         super(props);
     }
 
@@ -49,7 +49,7 @@ class Category extends React.Component<CategoryProps, ComponentState> {
         this.setDefaultState();
     }
 
-    componentWillReceiveProps(nextProps: CategoryProps) {
+    componentWillReceiveProps(nextProps: GroupProps) {
         // This method runs when incoming props (e.g., route params) change
         if (!nextProps.saving && this.props.saving) {
             if (this.props.saveResult != undefined && !this.props.saveResult.Success) {
@@ -74,9 +74,9 @@ class Category extends React.Component<CategoryProps, ComponentState> {
 
     private getCategories(): CategoryStore.ItemCategory[] {
         if (this.getState().filtered) {
-            return this.getState().filteredList.sort((x, y) => (!x.IsDeleted && y.IsDeleted) ? -1 : (x.IsDeleted == x.IsDeleted) ? 0 : 1);
+            return this.getState().filteredList;
         }
-        return this.props.categories.sort((x, y) => (!x.IsDeleted && y.IsDeleted) ? -1 : (x.IsDeleted == x.IsDeleted) ? 0 : 1);
+        return this.props.categories;
     }
 
     private closeForm() {
@@ -89,25 +89,6 @@ class Category extends React.Component<CategoryProps, ComponentState> {
 
     private validForm() {
         return this.getState().formCategory != undefined && this.getState().formCategory.Name !== "";
-    }
-
-    private editItem() {
-        this.setState({ ...this.getState(), formCategory: this.props.selectedCategory || this.getState().formCategory }, () => {
-            this.showForm();
-        });
-    }
-
-    private newItem() {
-        this.setState({ ...this.getState(), formCategory: {} }, () => {
-            this.showForm();
-        });
-    }
-
-    private deleteItem() {
-        if (this.props.selectedCategory != null) {
-            this.props.selectedCategory.IsDeleted = !this.props.selectedCategory.IsDeleted;
-            this.props.saveCategory(this.props.selectedCategory);
-        }
     }
 
     //--------------------------------------------------------------------------------------------------------
@@ -239,7 +220,7 @@ class Category extends React.Component<CategoryProps, ComponentState> {
                         <Table.Cell>{mapCategory.CreationUserId}</Table.Cell>
                         <Table.Cell>{mapCategory.UpdateDate ? DateFormatter.Format(mapCategory.UpdateDate) : ""}</Table.Cell>
                         <Table.Cell>{mapCategory.UpdateUserId}</Table.Cell>
-                        <Table.Cell negative={mapCategory.IsDeleted} positive={!mapCategory.IsDeleted}>{!mapCategory.IsDeleted ? 'Active' : 'Deleted'}</Table.Cell>
+                        <Table.Cell>{mapCategory.IsDeleted}</Table.Cell>
                     </Table.Row>);
                 })}
             </Table.Body>
@@ -255,6 +236,17 @@ class Category extends React.Component<CategoryProps, ComponentState> {
             </Segment>
     }
 
+    private editItem() {
+        this.setState({ ...this.getState(), formCategory: this.props.selectedCategory || this.getState().formCategory }, () => {
+            this.showForm();
+        });
+    }
+
+    private newItem() {
+        this.setState({ ...this.getState(), formCategory: {} }, () => {
+            this.showForm();
+        });
+    }
 
     private renderSubMenu() {
            return <Menu color='blue'>
@@ -262,9 +254,8 @@ class Category extends React.Component<CategoryProps, ComponentState> {
                <Menu.Item><Input icon='search' id={this.FilterInput} placeholder='Filter...' onChange={e => this.handleChange(e)}/></Menu.Item>
                <Menu.Item position='right'>
                    <Button.Group>
-                       <Button basic color='red' disabled={this.props.selectedCategory === undefined} onClick={e => this.deleteItem()}><Icon name='write' /> {this.props.selectedCategory && this.props.selectedCategory.IsDeleted ? 'Recover' : 'Delete'}</Button>
-                   <Button basic color='yellow' disabled={this.props.selectedCategory === undefined} onClick={e => this.editItem()}><Icon name='write' /> Edit</Button>
-                   <Button basic color='green' onClick={e => this.newItem()}><Icon name='add' /> New</Button>
+                   <Button basic color='yellow' disabled={this.props.selectedCategory === undefined} onClick={e => this.editItem()}><Icon name='write' /> Edit Category</Button>
+                   <Button basic color='green' onClick={e => this.newItem()}><Icon name='add' /> New Category</Button>
                    </Button.Group>
                 </Menu.Item>
             </Menu>

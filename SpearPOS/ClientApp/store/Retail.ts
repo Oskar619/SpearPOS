@@ -194,7 +194,7 @@ export const actionCreators = {
             let fetchTask = fetch(`api/Retail/GetRetailData`)
                 .then(response => response.json() as Promise<GenericApiResponseWithResult<RetailCategoryListItem[]>>)
                 .then(data => {
-                    dispatch({ type: 'RECEIVE_RETAIL_DATA', items: data.result });
+                    dispatch({ type: 'RECEIVE_RETAIL_DATA', items: data.Result });
                 });
 
             addTask(fetchTask); // Ensure server-side prerendering waits for this to complete
@@ -296,7 +296,7 @@ export const reducer: Reducer<RetailState> = (state: RetailState, action: KnownA
             return {
                 ...state,
                 saveResult: action.response,
-                dirty: action.response.success,
+                dirty: action.response.Success,
                 isSaving: false,
             };
         case 'ADD_TICKET_ITEM':

@@ -24,14 +24,14 @@ namespace SpearPOS.Controllers
         }
 
         [HttpGet("[action]")]
-        public GenericApiResponseWithResult<IEnumerable<CategoryListItem>> GetCategories()
+        public GenericApiResponseWithResult<IEnumerable<ItemCategory>> GetCategories()
         {
-            var result = new GenericApiResponseWithResult<IEnumerable<CategoryListItem>>();
-            var categoryItems = new List<CategoryListItem>();
+            var result = new GenericApiResponseWithResult<IEnumerable<ItemCategory>>();
+            var categoryItems = new List<ItemCategory>();
             
             try
             {
-                categoryItems = _context.ItemCategories.Select(category => new CategoryListItem { Id = category.Id, Beverage = category.Beverage, ButtonColor = category.ButtonColor, Name = category.Name, TextColor = category.TextColor }).ToList();
+                categoryItems = _context.ItemCategories.ToList();
 
             }catch(Exception ex)
             {
@@ -41,15 +41,14 @@ namespace SpearPOS.Controllers
             }
 
             result.Success = true;
-            result.Result = categoryItems.ToArray();
+            result.Result = categoryItems;
             return result;
         }
 
         [HttpPost("[action]")]
-        public GenericApiResponseWithResult<CategoryListItem> SaveCategory([FromBody] CategoryListItem category)
+        public GenericApiResponseWithResult<ItemCategory> SaveCategory([FromBody] ItemCategory category)
         {
-            var result = new GenericApiResponseWithResult<CategoryListItem>();
-            var cat = new ItemCategory();
+            var result = new GenericApiResponseWithResult<ItemCategory>();
             result.Success = true;
             try
             {
@@ -59,12 +58,11 @@ namespace SpearPOS.Controllers
                     category.CreationUserId = "oobeso";
                     category.CreationDate = DateTime.Now;
                     category.IsDeleted = false;
-                    Sync(cat, category);
-                    _context.Add(cat);
+                    _context.Add(category);
                 }
                 else
                 {
-                    cat = _context.ItemCategories.FirstOrDefault(x => x.Id == category.Id);
+                    var cat = _context.ItemCategories.FirstOrDefault(x => x.Id == category.Id);
                     category.UpdateDate = DateTime.Now;
                     category.UpdateUserId = "oobeso";
                     Sync(cat, category);
@@ -79,17 +77,17 @@ namespace SpearPOS.Controllers
             }
 
             if(result.Success)
-                result.Result = new CategoryListItem { Beverage = cat.Beverage, Id = cat.Id, ButtonColor = cat.ButtonColor, Name = cat.Name, TextColor = cat.TextColor  };
+                result.Result = category;
 
             return result;
         }
 
-        private void Sync(ItemCategory category, CategoryListItem item)
+        private void Sync(ItemCategory category, ItemCategory item)
         {
-            category.TextColor = item.TextColor != null ? item.TextColor.Value : 0;
+            category.TextColor = item.TextColor;
             category.Name = item.Name;
             category.Beverage = item.Beverage;
-            category.ButtonColor = item.ButtonColor != null ? item.ButtonColor.Value : 0;
+            category.ButtonColor = item.ButtonColor;
             category.CreationDate = item.CreationDate;
             category.CreationUserId = item.CreationUserId;
             category.IsDeleted = item.IsDeleted;
