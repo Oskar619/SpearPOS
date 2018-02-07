@@ -255,7 +255,6 @@ class Category extends React.Component<CategoryProps, ComponentState> {
             </Segment>
     }
 
-
     private renderSubMenu() {
            return <Menu color='blue'>
                <Menu.Item header><h1>Categories</h1></Menu.Item>
